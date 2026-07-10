@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaling Trust | An operating brief on AI adoption in value-based care</title>
+<meta name="description" content="Why 95% of enterprise AI pilots never become operations, and the four-gate discipline that separates the pilots that compound from the pilots that stall.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14232e;
+    --ink-soft: #3d4f5c;
+    --paper: #fbfaf7;
+    --panel: #ffffff;
+    --line: #d9d5cc;
+    --teal: #0e7c6b;
+    --teal-soft: #e3f0ed;
+    --amber: #a86a00;
+    --amber-soft: #f7ecd8;
+    --red: #a13333;
+    --red-soft: #f5e4e2;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --serif: 'Newsreader', Georgia, serif;
+    --sans: 'Public Sans', -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.62;
+    font-size: 16.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    display: block;
+    margin-bottom: 14px;
+  }
+  section { padding: 56px 0 8px; }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(38px, 6vw, 58px);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(25px, 3.4vw, 32px);
+    line-height: 1.18;
+    margin-bottom: 18px;
+  }
+  p { margin-bottom: 18px; max-width: 72ch; }
+  p.lede {
+    font-family: var(--serif);
+    font-size: clamp(19px, 2.4vw, 22px);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .muted { color: var(--ink-soft); }
+  strong { font-weight: 600; }
+
+  /* ---------- header ---------- */
+  header { padding: 72px 0 34px; border-bottom: 1px solid var(--line); }
+  .subtitle {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+
+  /* ---------- bottom line + stats ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 30px 0 8px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--teal);
+    border-radius: 6px;
+    padding: 20px 18px;
+  }
+  .stat .num {
+    font-family: var(--serif);
+    font-size: clamp(30px, 4vw, 40px);
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat .lbl { font-size: 13.5px; line-height: 1.45; color: var(--ink-soft); }
+
+  /* ---------- crossing diagram ---------- */
+  .crossing {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    margin: 26px 0 14px;
+    align-items: stretch;
+  }
+  .cross-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 20px;
+  }
+  .cross-panel h3 {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .cross-panel.pilot h3 { color: var(--ink-soft); }
+  .cross-panel.rollout h3 { color: var(--teal); }
+  .cross-panel ul { list-style: none; }
+  .cross-panel li {
+    font-size: 14.5px;
+    line-height: 1.5;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+  }
+  .cross-panel li:first-child { border-top: none; padding-top: 0; }
+  .cross-panel li .k {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .gradline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    position: relative;
+  }
+  .gradline .bar {
+    width: 3px;
+    flex: 1;
+    background: repeating-linear-gradient(to bottom, var(--teal) 0 8px, transparent 8px 15px);
+    border-radius: 2px;
+  }
+  .gradline .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--paper);
+    padding: 8px 4px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    white-space: nowrap;
+  }
+  .caption {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    max-width: 68ch;
+    margin-bottom: 18px;
+  }
+
+  /* ---------- postures table ---------- */
+  .table-scroll { overflow-x: auto; margin: 24px 0 10px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 14.5px;
+    min-width: 560px;
+  }
+  th, td {
+    padding: 13px 16px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+    line-height: 1.5;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: #f4f2ec;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.posture {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pill.good { background: var(--teal-soft); color: var(--teal); }
+  .pill.warn { background: var(--amber-soft); color: var(--amber); }
+  .pill.bad { background: var(--red-soft); color: var(--red); }
+
+  /* ---------- scorecard ---------- */
+  .scorecard {
+    background: var(--ink);
+    border-radius: 10px;
+    padding: 34px 30px 30px;
+    margin: 28px 0 14px;
+    color: #e8ecee;
+  }
+  .scorecard .eyebrow { color: #7fc9bc; }
+  .scorecard h2 { color: #ffffff; }
+  .scorecard p.sc-intro { color: #b9c4ca; font-size: 15px; max-width: 66ch; }
+  .gates { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+  .gate {
+    background: #1e3140;
+    border: 1px solid #33475a;
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .gate .g-name {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7fc9bc;
+  }
+  .gate .g-q {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: #e8ecee;
+    flex: 1;
+  }
+  .toggle { display: flex; gap: 8px; }
+  .toggle button {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 9px 8px;
+    border-radius: 6px;
+    border: 1px solid #46586a;
+    background: transparent;
+    color: #94a3ae;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .toggle button:hover { border-color: #7fc9bc; color: #cfe6e0; }
+  .toggle button:focus-visible { outline: 2px solid #7fc9bc; outline-offset: 2px; }
+  .toggle button.on-pass { background: var(--teal); border-color: var(--teal); color: #ffffff; }
+  .toggle button.on-fail { background: var(--red); border-color: var(--red); color: #ffffff; }
+  .verdict {
+    border-radius: 8px;
+    padding: 22px 22px;
+    background: #1e3140;
+    border: 1px solid #33475a;
+    transition: background .25s ease, border-color .25s ease;
+  }
+  .verdict .v-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #94a3ae;
+    margin-bottom: 6px;
+  }
+  .verdict .v-word {
+    font-family: var(--serif);
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    color: #ffffff;
+  }
+  .verdict .v-why { font-size: 14.5px; line-height: 1.55; color: #c4cdd3; max-width: 70ch; }
+  .verdict.v-pass { background: #103b34; border-color: var(--teal); }
+  .verdict.v-pass .v-word { color: #8fe0d0; }
+  .verdict.v-hold2 { background: #40331a; border-color: var(--amber); }
+  .verdict.v-hold2 .v-word { color: #f0c777; }
+  .verdict.v-kill { background: #401f1f; border-color: var(--red); }
+  .verdict.v-kill .v-word { color: #eda2a2; }
+  .sc-note { font-size: 12.5px; color: #8a99a3; margin-top: 14px; font-family: var(--mono); }
+
+  /* ---------- friction table ---------- */
+  .friction td:first-child { font-weight: 600; width: 38%; }
+
+  /* ---------- built panel ---------- */
+  .built {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--teal);
+    border-radius: 6px;
+    padding: 24px 24px 10px;
+    margin: 24px 0 10px;
+  }
+  .built p { font-size: 15px; }
+
+  /* ---------- footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 64px;
+    padding: 34px 0 60px;
+  }
+  footer .name {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+  }
+  footer a {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--teal);
+    text-decoration: none;
+    border-bottom: 1px solid var(--teal);
+  }
+  footer a:hover { opacity: .75; }
+
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: 1fr; }
+    .crossing { grid-template-columns: 1fr; }
+    .gradline { flex-direction: row; padding: 14px 0; }
+    .gradline .bar { height: 3px; width: auto; flex: 1; background: repeating-linear-gradient(to right, var(--teal) 0 8px, transparent 8px 15px); }
+    .gradline .tag { writing-mode: horizontal-tb; padding: 0 10px; }
+    .gates { grid-template-columns: 1fr; }
+    section { padding: 44px 0 6px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div style="display:inline-block; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 14px; margin-bottom: 22px;">Prepared for Carrum Health · July 2026</div>
+    <br>
+    <span class="eyebrow">An operating brief · AI adoption in value-based care</span>
+    <h1>Graduating the Pilot</h1>
+    <p class="subtitle">Why most enterprise AI pilots never become operations, and the four-gate discipline that separates the ones that compound from the ones that stall.</p>
+  </div>
+</header>
+
+<section id="orientation" style="padding-top: 40px;">
+  <div class="wrap">
+    <div class="built" style="margin: 0 0 6px; border-left-color: var(--ink);">
+      <p><strong>Why this page exists.</strong> I prepared this brief alongside my application for the Chief of Staff role at Carrum Health, a company that doubled its covered lives in a single year and has committed to extending its AI foundation across every link in the care chain. Rather than describe how I approach an ambiguous operating problem, I decided to show it. A company whose North Star is trusted access to high-quality care at lower cost needs its AI adoption governed by that same star. What follows is the shape of that governance: the diagnosis, the options, a scorecard you can use, and where the discipline breaks.</p>
+    </div>
+  </div>
+</section>
+
+<section id="bottom-line">
+  <div class="wrap">
+    <span class="eyebrow">The bottom line</span>
+    <p class="lede">Pilots do not die at the technology layer. They die at the moment of graduation, when a tool stops being an experiment and starts changing who is accountable for what. For a company whose product is trust, every workflow that gets automated either extends that promise or quietly rebuilds the friction the company exists to remove.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="num">95%</div>
+        <div class="lbl">of enterprise AI pilots deliver no measurable return.¹ The failure point is integration into real work, not model capability.</div>
+      </div>
+      <div class="stat">
+        <div class="num">7M</div>
+        <div class="lbl">covered lives after a single year of doubling.² At this scale, every internal workflow decision multiplies across millions of member interactions.</div>
+      </div>
+      <div class="stat">
+        <div class="num">45%</div>
+        <div class="lbl">savings per care episode, independently validated.³ The margin a trust-based model earns, and the margin a careless deployment puts at risk.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="challenge">
+  <div class="wrap">
+    <span class="eyebrow">The core challenge</span>
+    <h2>Graduation changes the physics</h2>
+    <p>A pilot is a tool nobody's job depends on. A rollout changes whose judgment counts, who answers when the output is wrong, and whose daily work gets restructured. When teams resist adoption, the standard diagnosis is skepticism and the standard prescription is training. Both miss the mechanism: people resist because no one has told them where their accountability now sits. Until that question has an answer, resistance is not a culture problem. It is due diligence performed by the people closest to the risk.</p>
+    <div class="crossing">
+      <div class="cross-panel pilot">
+        <h3>Pilot</h3>
+        <ul>
+          <li><span class="k">Stakes</span>Low. Voluntary. Reversible by anyone.</li>
+          <li><span class="k">Accountability</span>Diffuse. The experiment owns its own errors.</li>
+          <li><span class="k">Judgment</span>Unchanged. The tool advises, people decide as before.</li>
+          <li><span class="k">Blast radius</span>One team, contained.</li>
+        </ul>
+      </div>
+      <div class="gradline" aria-hidden="true">
+        <div class="tag">The graduation line</div>
+        <div class="bar"></div>
+      </div>
+      <div class="cross-panel rollout">
+        <h3>Rollout</h3>
+        <ul>
+          <li><span class="k">Stakes</span>Operational. Members feel the output.</li>
+          <li><span class="k">Accountability</span>Must be named, or it dissolves.</li>
+          <li><span class="k">Judgment</span>Redistributed. Someone's expertise is now mediated.</li>
+          <li><span class="k">Blast radius</span>Every business unit, multiplied by every member.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="caption">Everything that matters changes at the line, and none of it is technical. Healthcare has already run the careless version of this experiment: automated prior authorization triggered a volume arms race between payers and providers, and patients absorbed the delay. AI amplifies whatever a workflow was already designed to do. Deployed into workflows built to widen access, it widens access. Deployed as a cost shortcut into workflows nobody re-examined, it becomes the new gatekeeping.</p>
+  </div>
+</section>
+
+<section id="postures">
+  <div class="wrap">
+    <span class="eyebrow">Strategic options</span>
+    <h2>Three postures toward the gap</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Posture</th><th>Speed</th><th>What it produces</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="posture">Mandate from the top</td>
+            <td>Fast on paper</td>
+            <td>Quiet sabotage, shadow workflows, and usage metrics that flatter while outcomes stall.</td>
+            <td><span class="pill bad">Brittle</span></td>
+          </tr>
+          <tr>
+            <td class="posture">Let pilots bloom</td>
+            <td>Safe, slow</td>
+            <td>The 95%. Pilots without a graduation path are hobbies with budgets.</td>
+            <td><span class="pill warn">Stalls</span></td>
+          </tr>
+          <tr>
+            <td class="posture">Build graduation gates</td>
+            <td>Slower per pilot</td>
+            <td>Earned rollouts. Each graduation leaves behind trust and a template. The only posture that compounds.</td>
+            <td><span class="pill good">Compounds</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="provenance">
+  <div class="wrap">
+    <span class="eyebrow">Where this comes from</span>
+    <h2>The altitude is earned</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="lbl" style="margin-bottom:10px;"><strong style="color:var(--ink);">The authority diagnosis</strong></div>
+        <div class="lbl">comes from building adoption and governance systems inside a 3,500-person regulated utility, where every workflow change had a compliance shadow and mistakes were expensive.</div>
+      </div>
+      <div class="stat">
+        <div class="lbl" style="margin-bottom:10px;"><strong style="color:var(--ink);">The measurement gate</strong></div>
+        <div class="lbl">comes from codifying KPI, OKR, and evaluation frameworks that a global accelerator adopted as its organizational standard across four international programs.</div>
+      </div>
+      <div class="stat">
+        <div class="lbl" style="margin-bottom:10px;"><strong style="color:var(--ink);">The skepticism posture</strong></div>
+        <div class="lbl">comes from red-teaming large language models for bias at DEFCON 31's AI Village. I know these systems' failure modes from testing them, not from headlines.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scorecard-section">
+  <div class="wrap">
+    <div class="scorecard">
+      <span class="eyebrow">The recommendation · Try it</span>
+      <h2>The graduation scorecard</h2>
+      <p class="sc-intro">Four gates a pilot must clear before enterprise rollout, reviewed on a standing cadence rather than ad hoc enthusiasm. Score a hypothetical pilot and watch the verdict respond. One gate outranks the others.</p>
+      <div class="gates">
+        <div class="gate">
+          <span class="g-name">Gate 1 · Accountability</span>
+          <span class="g-q">Post-rollout ownership has a name attached. A person, not a committee, with authority to modify or kill the workflow. If no one will sign, that reluctance is information.</span>
+          <div class="toggle" role="group" aria-label="Gate 1 result">
+            <button type="button" data-gate="0" data-val="pass" aria-pressed="false">Pass</button>
+            <button type="button" data-gate="0" data-val="fail" aria-pressed="false">Fail</button>
+          </div>
+        </div>
+        <div class="gate">
+          <span class="g-name">Gate 2 · Enhancement</span>
+          <span class="g-q">The people whose work changes affirm the tool extends their judgment rather than replaces it. Their assessment, not their manager's. A pilot the operators would not keep has not passed.</span>
+          <div class="toggle" role="group" aria-label="Gate 2 result">
+            <button type="button" data-gate="1" data-val="pass" aria-pressed="false">Pass</button>
+            <button type="button" data-gate="1" data-val="fail" aria-pressed="false">Fail</button>
+          </div>
+        </div>
+        <div class="gate">
+          <span class="g-name">Gate 3 · Measurement</span>
+          <span class="g-q">Success was defined before rollout, and it measures outcomes, not usage. Cycle time to the member, error catch points, and whether humans now exercise more judgment on harder problems.</span>
+          <div class="toggle" role="group" aria-label="Gate 3 result">
+            <button type="button" data-gate="2" data-val="pass" aria-pressed="false">Pass</button>
+            <button type="button" data-gate="2" data-val="fail" aria-pressed="false">Fail</button>
+          </div>
+        </div>
+        <div class="gate">
+          <span class="g-name">Gate 4 · Access</span>
+          <span class="g-q">Post-automation, it is easier for a member to reach the care the network was built to deliver, measured from the member's side of the interaction. In a trust-based model, this gate is a veto.</span>
+          <div class="toggle" role="group" aria-label="Gate 4 result">
+            <button type="button" data-gate="3" data-val="pass" aria-pressed="false">Pass</button>
+            <button type="button" data-gate="3" data-val="fail" aria-pressed="false">Fail</button>
+          </div>
+        </div>
+      </div>
+      <div class="verdict" id="verdict" aria-live="polite">
+        <div class="v-label">Verdict</div>
+        <div class="v-word" id="v-word">Score all four gates</div>
+        <div class="v-why" id="v-why">The verdict updates as you decide. Skeptics are not overridden along the way; the strongest objection raised in each pilot becomes a design constraint recorded in the review. That is what psychological safety means operationally.</div>
+      </div>
+      <div class="sc-note">A well-documented kill is celebrated like a graduation. The kill memo is as valuable as the launch memo.</div>
+    </div>
+  </div>
+</section>
+
+<section id="friction">
+  <div class="wrap">
+    <span class="eyebrow">Friction analysis</span>
+    <h2>Where this fails in practice</h2>
+    <p class="muted">A discipline that cannot name its own failure modes is theater. Four to design against from day one.</p>
+    <div class="table-scroll">
+      <table class="friction">
+        <thead>
+          <tr><th>Failure mode</th><th>Countermeasure</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>The middle squeeze. Managers between leadership enthusiasm and team anxiety pass pilots that should die, because killing one reads as resistance.</td>
+            <td>Make the well-run kill a celebrated outcome, not a career risk.</td>
+          </tr>
+          <tr>
+            <td>Metric drift. Under quarterly pressure, outcome metrics quietly revert to usage metrics.</td>
+            <td>Fix success definitions before the pilot starts, in writing.</td>
+          </tr>
+          <tr>
+            <td>Speed pressure. Gates get waived for pilots with executive sponsors, converting governance into theater.</td>
+            <td>No waivers without a name attached. Someone signs either way.</td>
+          </tr>
+          <tr>
+            <td>Calcification. The discipline succeeds, then accretes into bureaucracy that kills velocity.</td>
+            <td>The gates review themselves on a schedule, or they become the next workaround.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="built">
+  <div class="wrap">
+    <span class="eyebrow">How this was built</span>
+    <div class="built">
+      <p>I built this brief with AI as an active collaborator, in the same working pattern it recommends, the way I have worked daily for the past two years. AI handled research synthesis, structural drafting, and stress-testing of the argument. Human judgment made the calls machines should not: the diagnosis that adoption failure is an authority problem rather than a technology problem, the decision that the access gate holds a veto in a trust-based model, and the friction analysis, which comes from years of watching organizations misattribute structural failures to the people absorbing them.</p>
+      <p class="muted">The boundary between what was delegated and what was decided is the point. It is the same boundary the four gates exist to protect.</p>
+      <p class="muted">One note on scope: the full graduation review design, the cadence, the templates, and the metric architecture behind these gates, is the work itself. This page is its shape.</p>
+    </div>
+  </div>
+</section>
+
+<section id="sources" style="padding-top: 20px;">
+  <div class="wrap">
+    <p class="muted" style="font-size:12.5px; font-family: var(--mono); line-height:1.7;">
+      1. MIT, The State of AI in Business, 2025.&nbsp;&nbsp;
+      2. Carrum Health announcement, April 2026.&nbsp;&nbsp;
+      3. RAND Corporation study of the Carrum Health model, published in Health Affairs.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="name">Aba N. Hammond</div>
+    <div style="margin-top:8px;"><a href="https://www.linkedin.com/in/abahamm" target="_blank" rel="noopener">linkedin.com/in/abahamm</a></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var results = [null, null, null, null];
+  var buttons = document.querySelectorAll('.toggle button');
+  var verdict = document.getElementById('verdict');
+  var vWord = document.getElementById('v-word');
+  var vWhy = document.getElementById('v-why');
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = parseInt(btn.dataset.gate, 10);
+      var val = btn.dataset.val;
+      results[g] = val;
+      document.querySelectorAll('.toggle button[data-gate="' + g + '"]').forEach(function (b) {
+        var active = b.dataset.val === val;
+        b.classList.toggle('on-pass', active && val === 'pass');
+        b.classList.toggle('on-fail', active && val === 'fail');
+        if (!active) { b.classList.remove('on-pass', 'on-fail'); }
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      render();
+    });
+  });
+
+  function render() {
+    if (results.indexOf(null) !== -1) {
+      verdict.className = 'verdict';
+      vWord.textContent = 'Score all four gates';
+      var remaining = results.filter(function (r) { return r === null; }).length;
+      vWhy.textContent = remaining + (remaining === 1 ? ' gate' : ' gates') + ' still undecided. A pilot without a full review is not on hold. It is unexamined.';
+      return;
+    }
+    var names = ['Accountability', 'Enhancement', 'Measurement', 'Access'];
+    var failed = [];
+    results.forEach(function (r, i) { if (r === 'fail') failed.push(names[i]); });
+    var accessFailed = results[3] === 'fail';
+
+    if (failed.length === 0) {
+      verdict.className = 'verdict v-pass';
+      vWord.textContent = 'Graduate';
+      vWhy.textContent = 'Roll out with the named owner, the pre-fixed outcome metrics, and a standing review date. Each graduation leaves behind trust and a template for the next one.';
+    } else if (failed.length >= 3) {
+      verdict.className = 'verdict v-kill';
+      vWord.textContent = 'Not ready';
+      vWhy.textContent = 'Failed: ' + failed.join(', ') + '. Return this one to pilot or retire it, and write the kill memo. A well-run kill protects the portfolio and teaches the next pilot what to clear.';
+    } else if (accessFailed) {
+      verdict.className = 'verdict v-hold2';
+      vWord.textContent = 'Hold · Access veto';
+      vWhy.textContent = 'This pilot may clear every internal efficiency bar, but it makes the member\u2019s path harder. In a business whose product is trust, the access gate outranks the others. Redesign the workflow from the member\u2019s side before re-review.';
+    } else {
+      verdict.className = 'verdict v-hold2';
+      vWord.textContent = 'Hold';
+      vWhy.textContent = 'Failed: ' + failed.join(', ') + '. The gap is specific and fixable. Convert the objection into a design constraint, assign it, and bring the pilot back to the next review.';
+    }
+  }
+})();
+</script>
+</body>
+</html>
